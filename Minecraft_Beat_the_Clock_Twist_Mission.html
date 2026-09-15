@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Minecraft Beat the Clock — Twist Mission</title>
+<style>
+body{font-family:Arial,sans-serif;background:#17251a;margin:0;color:#fff}
+.wrap{max-width:880px;margin:auto;padding:22px}.card{background:#26382a;border:2px solid #607d64;border-radius:16px;padding:22px;margin-top:16px}
+h1{margin:0 0 6px;font-size:30px}.sub{color:#cbd8cc}.timer{font-size:50px;font-weight:800;text-align:center;background:#101810;border-radius:14px;padding:12px;margin:16px 0}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.task{background:#334a36;padding:16px;border-radius:12px;text-align:left;border:0;color:#fff;cursor:pointer}
+.task strong{font-size:18px}.task span{display:block;color:#d7e3d7;margin-top:5px}.selected{outline:3px solid #f1d36b;background:#536d50}
+button.action{width:100%;padding:15px;border:0;border-radius:12px;background:#7aa66e;color:#071007;font-size:16px;font-weight:700;cursor:pointer;margin-top:12px}
+button.choice{padding:16px;border:0;border-radius:12px;background:#7aa66e;color:#071007;font-size:16px;font-weight:700;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}.hidden{display:none}.feedback{background:#1a281d;border-left:5px solid #d8b84e;padding:14px;border-radius:8px;margin-top:14px;line-height:1.5}
+.twist{font-size:19px;line-height:1.5}.badge{display:inline-block;padding:5px 9px;border-radius:8px;background:#d8b84e;color:#182018;font-weight:800}
+@media(max-width:600px){.grid{grid-template-columns:1fr}.timer{font-size:40px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>⛏️ Beat the Clock: Twist Mission</h1>
+<div class="sub">Minecraft-inspired • 1 student • Decision Making • 10 minutes</div>
+
+<div id="intro" class="card">
+<h2>🎯 Your Mission</h2>
+<p>Night is coming. You have <b>10 minutes</b> to prepare your new Minecraft world.</p>
+<p>You can complete only <b>TWO tasks</b>. But the world may surprise you.</p>
+<p><b>Your job:</b> make the best decision with the information you have.</p>
+<button class="action" id="start">▶ Start Mission</button>
+</div>
+
+<div id="game" class="hidden">
+<div class="timer" id="timer">10:00</div>
+
+<section id="r1" class="card">
+<h2>ROUND 1 — Choose TWO</h2>
+<p>You have 30 seconds to plan.</p>
+<div class="grid">
+<button class="task" data-name="Shelter">🏠 <strong>Build Shelter</strong><span>4 min • Safety</span></button>
+<button class="task" data-name="Food">🍎 <strong>Find Food</strong><span>3 min • Survival</span></button>
+<button class="task" data-name="Stone">🪨 <strong>Collect Stone</strong><span>2 min • Tools</span></button>
+<button class="task" data-name="Diamonds">💎 <strong>Search Diamonds</strong><span>5 min • Valuable but risky</span></button>
+</div>
+<button class="action" id="confirm" disabled>Confirm My Two Choices</button>
+<div id="f1" class="feedback hidden"></div>
+</section>
+
+<section id="r2" class="card hidden">
+<h2>🐺 TWIST 1 — Danger!</h2>
+<p class="twist">You hear a noise behind you.</p>
+<p class="twist">A group of <b>hostile mobs</b> is moving toward your area.</p>
+<p class="twist"><span class="badge">7 minutes left</span></p>
+<p><b>Do you keep your original plan or change it?</b></p>
+<div class="grid">
+<button class="choice" id="keep">➡️ Keep My Plan</button>
+<button class="choice" id="change">🔄 Change My Plan</button>
+</div>
+<div id="f2" class="feedback hidden"></div>
+</section>
+
+<section id="r3" class="card hidden">
+<h2>🌧️ TWIST 2 — Sudden Storm!</h2>
+<p class="twist">Dark clouds appear and a heavy storm begins.</p>
+<p class="twist">Your shelter is still unfinished.</p>
+<p class="twist"><span class="badge">5 minutes left</span></p>
+<p><b>What should be your priority now?</b></p>
+<div class="grid">
+<button class="choice" id="finishShelter">🏠 Finish Shelter</button>
+<button class="choice" id="continueTask">🎯 Continue Original Task</button>
+</div>
+<div id="f3" class="feedback hidden"></div>
+</section>
+
+<section id="r4" class="card hidden">
+<h2>💎 TWIST 3 — Rare Opportunity!</h2>
+<p class="twist">You suddenly spot a small diamond vein nearby!</p>
+<p class="twist">It could be very valuable.</p>
+<p class="twist"><span class="badge">3 minutes left</span></p>
+<p><b>Do you take the opportunity or stick with your priority?</b></p>
+<div class="grid">
+<button class="choice" id="diamonds">💎 Go for Diamonds</button>
+<button class="choice" id="priority">🛡️ Stick With My Priority</button>
+</div>
+<div id="f4" class="feedback hidden"></div>
+</section>
+
+<section id="end" class="card hidden">
+<h2>🏆 Mission Complete</h2>
+<p id="result" class="twist"></p>
+<div class="feedback">
+<b>🧠 What did you practise?</b><br><br>
+⏱️ Limited time → 🎯 Set priorities → 🤔 Make a choice → 🔄 Reassess when things change → ⚠️ Think about consequences
+</div>
+<h3>Teacher Reflection</h3>
+<ul>
+<li>What was your main goal?</li>
+<li>Which twist changed your thinking the most?</li>
+<li>Did you ever choose something valuable but decide it was not the priority?</li>
+<li>What would make you change your decision?</li>
+</ul>
+<button class="action" onclick="location.reload()">🔁 Play Again</button>
+</section>
+</div>
+</div>
+
+<script>
+let selected=[],time=600,interval;
+const $=id=>document.getElementById(id);
+$("start").onclick=()=>{
+$("intro").classList.add("hidden");$("game").classList.remove("hidden");
+interval=setInterval(()=>{time--;let m=Math.floor(time/60),s=time%60;
+$("timer").textContent=m+":"+String(s).padStart(2,"0");
+if(time<=0){clearInterval(interval);$("timer").textContent="TIME!";}},1000);
+};
+document.querySelectorAll(".task").forEach(b=>b.onclick=()=>{
+let n=b.dataset.name;
+if(selected.includes(n)){selected=selected.filter(x=>x!==n);b.classList.remove("selected")}
+else if(selected.length<2){selected.push(n);b.classList.add("selected")}
+$("confirm").disabled=selected.length!==2;
+});
+$("confirm").onclick=()=>{
+$("f1").classList.remove("hidden");$("f1").innerHTML="You chose <b>"+selected.join(" + ")+"</b>. Remember: there is no perfect answer — your reasoning matters.";
+document.querySelectorAll(".task").forEach(b=>b.disabled=true);$("confirm").disabled=true;
+setTimeout(()=>$("r2").classList.remove("hidden"),700);
+};
+function next(id,msg){
+$(id).classList.remove("hidden");$(id).innerHTML=msg;
+}
+$("keep").onclick=()=>{next("f2","You kept your plan. <b>Good — now justify it.</b> Ask yourself: has the new danger changed what matters most?");setTimeout(()=>$("r3").classList.remove("hidden"),900)};
+$("change").onclick=()=>{next("f2","You changed your plan. <b>Good — now explain what evidence caused the change.</b>");setTimeout(()=>$("r3").classList.remove("hidden"),900)};
+$("finishShelter").onclick=()=>{next("f3","You prioritised immediate safety. <b>Why?</b> The best choice can change when the situation changes.");setTimeout(()=>$("r4").classList.remove("hidden"),900)};
+$("continueTask").onclick=()=>{next("f3","You continued your original task. <b>Now explain the risk.</b> What could happen if the storm makes survival harder?");setTimeout(()=>$("r4").classList.remove("hidden"),900)};
+$("diamonds").onclick=()=>{next("f4","You chased the rare opportunity. <b>Risk:</b> diamonds are valuable, but with only 3 minutes you may lose the chance to secure safety.");setTimeout(()=>finish("opportunity"),900)};
+$("priority").onclick=()=>{next("f4","You stayed with your priority. <b>Key idea:</b> something can be valuable without being the most important choice right now.");setTimeout(()=>finish("priority"),900)};
+function finish(type){
+["r2","r3","r4"].forEach(x=>$(x).classList.add("hidden"));$("end").classList.remove("hidden");clearInterval(interval);
+$("result").innerHTML=type==="priority"
+?"You completed the mission by protecting your priority despite a tempting opportunity. Strong decision makers know when <b>not</b> to chase every opportunity."
+:"You completed the mission by taking a calculated risk. Your challenge now is to explain whether the reward was worth the risk and lost time.";
+}
+</script>
+</body>
+</html>
